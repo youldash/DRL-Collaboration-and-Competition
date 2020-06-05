@@ -2,7 +2,7 @@
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/youldash.svg?style=social?style=plastic)](https://twitter.com/youldash)
 
-[banana]: misc/reacher.gif "Unity ML-Agents Reacher Environment."
+[tennis]: misc/tennis.png "Unity ML-Agents Tennis Environment."
 
 ## License
 
@@ -13,7 +13,7 @@ By using this site, you agree to the **Terms of Use** that are defined in [LICEN
 The goal of this project is to train a so-called [intelligent agent](https://en.wikipedia.org/wiki/Intelligent_agent) (in the form of a double-jointed arm) to reach target locations in a virtual world (or environment).
 
 <div align="center">
-	<img src="misc/reacher.gif" width="100%" />
+	<img src="misc/tennis.png" width="100%" />
 </div>
 
 This project was developed in partial fulfillment of the requirements for Udacity's [Deep Reinforcement Learning Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893) program.
