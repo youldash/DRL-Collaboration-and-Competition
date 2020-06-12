@@ -29,8 +29,8 @@ Initial attempts were made for developing `agent` implementations of the MADDPG 
 
 The MADDPG agent employs the following two critical components to operate:
 
-1. An **Actor** network (see `model.py` for details).
-2. A **Critic** network (see `model.py` for details).
+1. An **Actor** network (see `maddpg/model.py` for details).
+2. A **Critic** network (see `maddpg/model.py` for details).
 
 Initially, the MAPPDG algorithm was introduced as an extension of the DDPG algorithm for multi-agent environments. Think of MADDPG as a sort of "wrapper" for handling multiple DDPG agents. The power of the MADDPG algorithm on the other hand, resides in its adoption of a so-called "framework" for centralized training and decentralized execution. This means that there is (generally) extra information used during training that is not used during testing. More importantly, the training process makes use of both `actors` and `critics` (just like DDPG). The key-distinction here is that the input to each agent's critic consists of all the observations and actions (for all the agents combined). However, since only the `actor` is present during testing, that extra information used during training effectively, simply, fades away. As such, this framework makes the MADDPG algorithm **flexible enough** to handle competitive, collaborative, and mixed environments. Thus, it was mainly nominated for investigation in this project.
 
