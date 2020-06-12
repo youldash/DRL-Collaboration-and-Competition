@@ -19,7 +19,7 @@ In addition to the main MADDPG implementation and training runs, which are detai
 
 ## The Multi-agent Deep Deterministic Policy Gradient (Learning) Algorithm
 
-Initial attempts were made for developing an `agent` implementation of the **MADDPG** algorithm (see `maddpg/agent.py` in this repo for details). The algorithm is summarized below:
+Initial attempts were made for developing `agent` implementations of the MADDPG algorithm (see `maddpg/agent.py` in this repo for details). The algorithm is summarized below:
 
 [ddpg]: misc/algorithm.png "Multi-agent Deep Deterministic Policy Gradient (MADDPG)."
 
@@ -32,9 +32,19 @@ The MADDPG agent employs the following two critical components to operate:
 1. An **Actor** network (see `actor.py` for details).
 2. A **Critic** network (see `critic.py` for details).
 
+Initially, the MAPPDG algorithm was introduced as an extension of the DDPG algorithm for multi-agent environments. Think of MADDPG as a sort of "wrapper" for handling multiple DDPG agents. The power of the MADDPG algorithm on the other hand, resides in its adoption of a so-called "framework" for centralized training and decentralized execution. This means that there is (generally) extra information used during training that is not used during testing. More importantly, the training process makes use of both `actors` and `critics` (just like DDPG). The key-distinction here is that the input to each agent's critic consists of all the observations and actions (for all the agents combined). However, since only the `actor` is present during testing, that extra information used during training effectively, simply, fades away. As such, this framework makes the MADDPG algorithm **flexible enough** to handle competitive, collaborative, and mixed environments. Thus, it was mainly nominated for investigation in this project.
+
+The following diagram illustrates how the MADDPG algorithm operates:
+
+[ddpg]: misc/maddpg-process.png "MADDPG process."
+
+<div align="center">
+	<img src="misc/maddpg-process.png" width="75%" />
+</div>
+
 ### The Actor
 
-An **Actor**, based on the above **MADDPG** pseudocode listing, uses two [Artificial Neural Networks (ANNs)](https://en.wikipedia.org/wiki/Artificial_neural_network) for deterministic policy approximations as `state_i -> argmax_Q_i` mappings for each agent separately (each identified by an *identifier*, `i`).
+An **Actor**, based on the above MADDPG pseudocode listing, uses two [Artificial Neural Networks (ANNs)](https://en.wikipedia.org/wiki/Artificial_neural_network) for deterministic policy approximations as `state_i -> argmax_Q_i` mappings for each agent separately (each identified by an *identifier*, `i`).
 
 ### The Critic
 
@@ -42,11 +52,68 @@ Like an **Actor**, a **Critic** also uses an ANN with two "heads" for `Q-value` 
 
 ### Added Noise
 
-The **MADDPG** algorithm implementation also incorporates a sample of the [Ornstein–Uhlenbeck stochastic process](https://en.wikipedia.org/wiki/Ornstein–Uhlenbeck_process). See `noise.py` implementation details, and on the previous link for a detailed mathematical description on the process.
+Similar to the DDPG algorithm implementation in the previous project, the MADDPG algorithm implementation also incorporates a sample of the [Ornstein–Uhlenbeck stochastic process](https://en.wikipedia.org/wiki/Ornstein–Uhlenbeck_process). See `noise.py` implementation details, and on the previous link for a detailed mathematical description on the process.
 
-## The MADDPG Architecture
+## The DDPG (Network) Architecture
 
-The [Neural Network (NN)](https://pathmind.com/wiki/neural-network) architecture for building the training model for the MADDPG algorithm is logged below:
+The [Neural Network (NN)](https://pathmind.com/wiki/neural-network) architecture for building the training model for the DDPG algorithm is logged below:
+
+``` Bash
+Actor (Local):
+Actor(
+  (fc1): Linear(in_features=24, out_features=768, bias=True)
+  (fc2): Linear(in_features=768, out_features=512, bias=True)
+  (fc3): Linear(in_features=512, out_features=2, bias=True)
+)
+Actor (Target):
+Actor(
+  (fc1): Linear(in_features=24, out_features=768, bias=True)
+  (fc2): Linear(in_features=768, out_features=512, bias=True)
+  (fc3): Linear(in_features=512, out_features=2, bias=True)
+)
+Critic (Local):
+Critic(
+  (fcs1): Linear(in_features=24, out_features=512, bias=True)
+  (fc2): Linear(in_features=514, out_features=256, bias=True)
+  (fc3): Linear(in_features=256, out_features=128, bias=True)
+  (fc4): Linear(in_features=128, out_features=1, bias=True)
+)
+Critic (Target):
+Critic(
+  (fcs1): Linear(in_features=24, out_features=512, bias=True)
+  (fc2): Linear(in_features=514, out_features=256, bias=True)
+  (fc3): Linear(in_features=256, out_features=128, bias=True)
+  (fc4): Linear(in_features=128, out_features=1, bias=True)
+)
+```
+
+Each of the two agents in the DDPG implementation notebook (and accompanying source code) used the above architecture for solving the environment. See the `ddpg/` folder for implementation details.
+
+### The Actor Model (Architecture)
+
+As mentioned above, an `actor` builds an Actor (Policy) NN that maps `states -> actions`. Further, it (*i.e.* the `model`) is comprised of the following:
+
+- The `actor` has `3` **Fully-connected (FC)** layers.
+- The **first FC** layer takes in the **state**, and passes it through `786` nodes with `ReLU` activation.
+- The **second FC** layer take the output from previous layer, and passes it through `512` nodes with `ReLU` activation.
+- The **third PC** layer takes the output from the previous layer, and outputs the `action size` with `Tanh` activation.
+- The model utilizes an `Adam` optimizer for enhancing the performance of the model.
+
+### The Critic Model (Architecture)
+
+The `critic` model, as mentioned above, builds a Critic (Value) NN that maps `(state, action)` pairs `-> Q-values`. The network is made up of the following:
+
+- The `critic` has `4` **(FC)** layers.
+- The **first FC** layer takes in the **state**, and passes it through `512` nodes with `ReLU` activation.
+- The output from this layer is then taken, and then concatenated with the **action size**.
+- The **second FC** layer take the concatenated output, and passes it through `256` nodes with `ReLU` activation.
+- The **third PC** layer takes the output from the previous layer, and passes it through `128` nodes with `ReLU` activation.
+- The **fourth PC** layer then finally takes the output from the previous layer and outputs `1` node.
+- Similar to the `actor`, this model utilizes `Adam` for optimizing the performance of the network.
+
+## The MADDPG (Network) Architecture
+
+The NN architecture for building the training model for the MADDPG algorithm is logged below:
 
 ``` Bash
 Actor (Local):
@@ -87,45 +154,11 @@ Critic(
 	<img src="plots/Attempt.png" width="100%" />
 </div>
 
-- Our best training configuration is reported herein. A **DDPG** `agent` configuration solved the virtual world (or environment) in a good number of episodes. This was set as a point of reference to beat in our future attempts. The `agent`'s architecture was adjusted based on the following NN configurations:
+- Our best training configuration is reported herein. A DDPG `agent` configuration solved the virtual world (or environment) in a good number of episodes. This was set as a point of reference to beat in our future attempts. The `agent`'s architecture was adjusted based on the following NN configurations:
 
-### The Actor Model (Architecture)
 
-As mentioned above, an `actor` builds an Actor (Policy) NN that maps `states -> actions`. Further, it (*i.e.* the `model`) is comprised of the following:
 
-- The `actor` has `3` **Fully-connected (FC)** layers.
-- The **first FC** layer takes in the **state**, and passes it through `256` nodes with `ReLU` activation.
-- The **second FC** layer take the output from previous layer, and passes it through `128` nodes with `ReLU` activation.
-- The **third PC** layer takes the output from the previous layer, and outputs the `action size` with `Tanh` activation.
-- The model utilizes an `Adam` optimizer for enhancing the performance of the model.
 
-The following figure summarizes the `actor` architecture in detail. The plot was generated using the preinstalled [torchviz](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjDou73gOvpAhWFxoUKHenVBKAQFjAAegQIARAB&url=https%3A%2F%2Fpypi.org%2Fproject%2Ftorchviz%2F&usg=AOvVaw0mFjGWq6fnUjTbmf8EAK5Y) Python package:
-
-[actor]: plot/Actor.png "Actor."
-
-<div align="center">
-	<img src="plots/Actor.png" width="50%" />
-</div>
-
-### The Critic Model (Architecture)
-
-The `critic` model, as mentioned above, builds a Critic (Value) NN that maps `(state, action)` pairs `-> Q-values`. The network is made up of the following:
-
-- The `critic` has `4` **(FC)** layers.
-- The **first FC** layer takes in the **state**, and passes it through `128` nodes with `ReLU` activation.
-- The output from this layer is then taken, and then concatenated with the **action size**.
-- The **second FC** layer take the concatenated output, and passes it through `64` nodes with `ReLU` activation.
-- The **third PC** layer takes the output from the previous layer, and passes it through `32` nodes with `ReLU` activation.
-- The **fourth PC** layer then finally takes the output from the previous layer and outputs `1` node.
-- Similar to the `actor`, this model utilizes `Adam` for optimizing the performance of the network.
-
-The following figure summarizes the `critic` architecture in detail. The plot was generated using the preinstalled [torchviz](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjDou73gOvpAhWFxoUKHenVBKAQFjAAegQIARAB&url=https%3A%2F%2Fpypi.org%2Fproject%2Ftorchviz%2F&usg=AOvVaw0mFjGWq6fnUjTbmf8EAK5Y) Python package:
-
-[critic]: plot/Actor.png "Critic."
-
-<div align="center">
-	<img src="plots/Critic.png" width="50%" />
-</div>
 
 ## The Training Notebook
 
@@ -133,7 +166,7 @@ See the [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-
 
 In addition to the notebook you'll have access to the following Python files:
 
-* `agent.py` contains a **DDPG** agent implementation, which interacts with the environment to optimize the rewards.
+* `agent.py` contains a DDPG agent implementation, which interacts with the environment to optimize the rewards.
 * `buffer.py` contains a `ReplayBuffer` class, which is used by the agent to record and sample `(state, action, reward, next_state)` tuples for training of the model.
 * `model.py` includes both `actor` and `critic` modules, and takes in the input **state** and outputs the desired `Q-values`.
 * `noise.py` implements the Ornstein–Uhlenbeck stochastic process (as mentioned above), which adds noise to the actions.  
@@ -144,7 +177,7 @@ In all of our experiments a set of tuning parameters (or rather **hyperparameter
 
 ### Notebook Parameters
 
-The **DDPG** algorithm is implemented using the following function declaration:
+The DDPG algorithm is implemented using the following function declaration:
 
 > See the [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook for the complete function implementation.
 
