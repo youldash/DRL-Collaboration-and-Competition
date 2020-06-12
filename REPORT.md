@@ -24,7 +24,7 @@ Initial attempts were made for developing `agent` implementations of the MADDPG 
 [ddpg]: misc/algorithm.png "Multi-agent Deep Deterministic Policy Gradient (MADDPG)."
 
 <div align="center">
-	<img src="misc/algorithm.png" width="50%" />
+	<img src="misc/algorithm.png" width="75%" />
 </div>
 
 The MADDPG agent employs the following two critical components to operate:
@@ -39,7 +39,7 @@ The following diagram illustrates how the MADDPG algorithm operates:
 [ddpg]: misc/maddpg-process.png "MADDPG process."
 
 <div align="center">
-	<img src="misc/maddpg-process.png" width="75%" />
+	<img src="misc/maddpg-process.png" width="50%" />
 </div>
 
 ### The Actor
