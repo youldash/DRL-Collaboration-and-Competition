@@ -4,54 +4,82 @@
 
 ## License
 
-By using this site, you agree to the **Terms of Use** that are defined in [LICENSE](https://github.com/youldash/DRL-Continuous-Control/blob/master/LICENSE).
+By using this site, you agree to the **Terms of Use** that are defined in [LICENSE](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/LICENSE).
 
 ## Algorithm Implementation
 
-As mentioned in the [`README.md`](https://github.com/youldash/DRL-Continuous-Control/blob/master/README.md) file of this repo, The project was developed in partial fulfillment of the requirements for Udacity's [Deep Reinforcement Learning (DRL) Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893) program. To solve the challenges presented therein, we explored (and implemented) the [Deep Deterministic Policy Gradient (DDPG)](https://spinningup.openai.com/en/latest/algorithms/ddpg.html) algorithm. This choice is motivated by the fact that the action space is continuous, and the DDPG algorithm has shown quite an impressive performance in past.
+As mentioned in the [`README.md`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/README.md) file of this repo, The project was developed in partial fulfillment of the requirements for Udacity's [Deep Reinforcement Learning (DRL) Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893) program. To solve the challenges presented therein, we explored (and implemented) working versions of both
 
-## The Deep Deterministic Policy Gradient (Learning) Algorithm
+- the [Deep Deterministic Policy Gradient (DDPG)](https://spinningup.openai.com/en/latest/algorithms/ddpg.html) algorithm, and
+- the [Multi-agent Deep Deterministic Policy Gradient (MADDPG)](https://openai.com/blog/learning-to-cooperate-compete-and-communicate/) algorithm (see [this](https://arxiv.org/pdf/1706.02275.pdf) paper for details).
 
-Initial attempts were made for developing an `agent` implementation of the **DDPG** algorithm (see `agent.py` for details). The algorithm is summarized below:
+The MADDPG is a great choice for this environment due to the existence of multiple agents, and the approach presented herein was inspired by the implementation used in the Udacity online labs for solving the physical deception environment.
 
-[ddpg]: misc/algorithm.png "Deep Deterministic Policy Gradient (DDPG)."
+In addition to the main MADDPG implementation and training runs, which are detailed in the accompanying [`TennisUsingMADDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingMADDPG.ipynb) notebook file, a detailed notebook for the DDPG test runs is also included (see [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingDDPG.ipynb) for details). The reason for considering the DDPG algorithm in the first place (which was used to solve the challenges presented in the [previous Udacity project](https://github.com/youldash/DRL-Continuous-Control)) is due to its capability in solving this challenge too.
+
+## The Multi-agent Deep Deterministic Policy Gradient (Learning) Algorithm
+
+Initial attempts were made for developing an `agent` implementation of the **MADDPG** algorithm (see `maddpg/agent.py` in this repo for details). The algorithm is summarized below:
+
+[ddpg]: misc/algorithm.png "Multi-agent Deep Deterministic Policy Gradient (MADDPG)."
 
 <div align="center">
 	<img src="misc/algorithm.png" width="75%" />
 </div>
 
-The DDPG agent employs the following two critical components to operate:
+The MADDPG agent employs the following two critical components to operate:
 
 1. An **Actor** network (see `actor.py` for details).
 2. A **Critic** network (see `critic.py` for details).
 
 ### The Actor
 
-An **Actor**, based on the above **DDPG** pseudocode listing, uses an [Artificial Neural Network (ANN)](https://en.wikipedia.org/wiki/Artificial_neural_network) for deterministic policy approximations as `state -> argmax_Q` mappings with the following *loss minimization* function:
-
-[ddpg actor loss]: misc/DDPGActorLoss.png "Actor loss function."
-
-<div align="center">
-	<img src="misc/DDPGActorLoss.png" width="50%" />
-</div>
+An **Actor**, based on the above **MADDPG** pseudocode listing, uses two [Artificial Neural Networks (ANNs)](https://en.wikipedia.org/wiki/Artificial_neural_network) for deterministic policy approximations as `state_i -> argmax_Q_i` mappings for each agent separately (each identified by an *identifier*, `i`).
 
 ### The Critic
 
-Like an **Actor**, a **Critic** also uses an ANN for `Q-value` function approximations as `state -> action` mappings with the following *loss minimization* function:
-
-[ddpg critoc loss]: misc/DDPGCriticLoss.png "Critic loss function."
-
-<div align="center">
-	<img src="misc/DDPGCriticLoss.png" width="35%" />
-</div>
+Like an **Actor**, a **Critic** also uses an ANN with two "heads" for `Q-value` function approximation as `state1`, `state2`, `action1`, `action2 -> q_value1`, `q_value2`, where `state1`, `state2`, `action1`, `action2` are the states and actions of agents `#1` and `#2` correspondingly.
 
 ### Added Noise
 
-The **DDPG** algorithm implementation also incorporates a sample of the [Ornstein–Uhlenbeck stochastic process](https://en.wikipedia.org/wiki/Ornstein–Uhlenbeck_process). See `noise.py` implementation details, and on the previous link for a detailed mathematical description on the process.
+The **MADDPG** algorithm implementation also incorporates a sample of the [Ornstein–Uhlenbeck stochastic process](https://en.wikipedia.org/wiki/Ornstein–Uhlenbeck_process). See `noise.py` implementation details, and on the previous link for a detailed mathematical description on the process.
+
+## The MADDPG Architecture
+
+The [Neural Network (NN)](https://pathmind.com/wiki/neural-network) architecture for building the training model for the MADDPG algorithm is logged below:
+
+``` Bash
+Actor (Local):
+Actor(
+  (fc1): Linear(in_features=24, out_features=768, bias=True)
+  (fc2): Linear(in_features=768, out_features=512, bias=True)
+  (fc3): Linear(in_features=512, out_features=2, bias=True)
+)
+Actor (Target):
+Actor(
+  (fc1): Linear(in_features=24, out_features=768, bias=True)
+  (fc2): Linear(in_features=768, out_features=512, bias=True)
+  (fc3): Linear(in_features=512, out_features=2, bias=True)
+)
+Critic (Local):
+Critic(
+  (fcs1): Linear(in_features=24, out_features=512, bias=True)
+  (fc2): Linear(in_features=514, out_features=256, bias=True)
+  (fc3): Linear(in_features=256, out_features=128, bias=True)
+  (fc4): Linear(in_features=128, out_features=1, bias=True)
+)
+Critic (Target):
+Critic(
+  (fcs1): Linear(in_features=24, out_features=512, bias=True)
+  (fc2): Linear(in_features=514, out_features=256, bias=True)
+  (fc3): Linear(in_features=256, out_features=128, bias=True)
+  (fc4): Linear(in_features=128, out_features=1, bias=True)
+)
+```
 
 ## Early Attempts
 
-- Numerous attempts were made to improve the results obtained from training the networks. All ended with no favorable outcomes, thus losing precious GPU time when using the Udacity workspace. Our attempts were based on [choosing 20 agents and training them for solving the environment](https://github.com/youldash/DRL-Continuous-Control#version-2-twenty-20-agents). See the following figure (plot) for a failed attempt (*i.e.* the agents didn't reach the targeted average score of `+30` over `100` consecutive episodes, and over all agents):
+- Numerous attempts were made to improve the results obtained from training the networks. All ended with no favorable outcomes, thus losing precious GPU time when using the Udacity workspace. Our attempts were based on [choosing 20 agents and training them for solving the environment](https://github.com/youldash/DRL-Collaboration-and-Competition#version-2-twenty-20-agents). See the following figure (plot) for a failed attempt (*i.e.* the agents didn't reach the targeted average score of `+30` over `100` consecutive episodes, and over all agents):
 
 [attempt]: plot/Attempt.png "Failed attempt."
 
@@ -59,7 +87,7 @@ The **DDPG** algorithm implementation also incorporates a sample of the [Ornstei
 	<img src="plots/Attempt.png" width="100%" />
 </div>
 
-- Our best training configuration is reported herein. A **DDPG** `agent` configuration solved the virtual world (or environment) in a good number of episodes. This was set as a point of reference to beat in our future attempts. The `agent`'s architecture was adjusted based on the following [Neural Network (NN)](https://pathmind.com/wiki/neural-network) configurations:
+- Our best training configuration is reported herein. A **DDPG** `agent` configuration solved the virtual world (or environment) in a good number of episodes. This was set as a point of reference to beat in our future attempts. The `agent`'s architecture was adjusted based on the following NN configurations:
 
 ### The Actor Model (Architecture)
 
@@ -101,7 +129,7 @@ The following figure summarizes the `critic` architecture in detail. The plot wa
 
 ## The Training Notebook
 
-See the [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Continuous-Control/blob/master/ContinuousControlUsingDDPG.ipynb) Jupyter notebook for implementation details and the rewards (*i.e.* the results) obtained after training and testing. The experiments shown in the notebook yielded **outstanding** results.
+See the [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingDDPG.ipynb) Jupyter notebook for implementation details and the rewards (*i.e.* the results) obtained after training and testing. The experiments shown in the notebook yielded **outstanding** results.
 
 In addition to the notebook you'll have access to the following Python files:
 
@@ -118,7 +146,7 @@ In all of our experiments a set of tuning parameters (or rather **hyperparameter
 
 The **DDPG** algorithm is implemented using the following function declaration:
 
-> See the [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Continuous-Control/blob/master/ContinuousControlUsingDDPG.ipynb) notebook for the complete function implementation.
+> See the [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook for the complete function implementation.
 
 ``` Python
 def ddpg(n_episodes=int(1e3), max_t=int(1e3)):
@@ -152,7 +180,7 @@ The following graph illustrated the outcomes:
 
 ![](./plots/Rewards.png)
 
-The trained agents, as witnesses in the accompanying   [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Continuous-Control/blob/master/ContinuousControlUsingDDPG.ipynb) notebook file, revealed the following results:
+The trained agents, as witnesses in the accompanying   [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook file, revealed the following results:
 
 ```
 EP 119	MIN: 29.68	MAX: 39.17	SCORE: 36.58	BEST: 37.66	AVG: 29.49	BEST AVG: 29.49
@@ -170,7 +198,7 @@ In this training round the agents did in fact reach the targeted average score o
 
 ## Conclusion and Future Work
 
-This report presented out work in training an agent to solve the environment, while considering varying architectures to determine which `agent` configuration would be deemed the best in our experiments. In all attempts the results shown in the [this part](https://github.com/youldash/DRL-Continuous-Control/blob/master/REPORT.md#the-training-notebook) set the benchmark for future attempts. 
+This report presented out work in training an agent to solve the environment, while considering varying architectures to determine which `agent` configuration would be deemed the best in our experiments. In all attempts the results shown in the [this part](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/REPORT.md#the-training-notebook) set the benchmark for future attempts. 
 
 The work presented herein was made possible using Udacity's [NVIDIA Tesla K80 accelerator GPU](https://www.nvidia.com/en-gb/data-center/tesla-k80/) architecture. In future works we plan on implementing (and training all agents) locally using NVIDIA GPUs (both internally, and externally mounted using eGPU enclosures).
  
@@ -179,7 +207,7 @@ With the possibility of reaching better outcomes by tweaking the parameters a bi
 ### Alternatives to Deep Deterministic Policy Gradients
 
 * The [Proximal Policy Optimization (PPO)](https://medium.com/@jonathan_hui/rl-proximal-policy-optimization-ppo-explained-77f014ec3f12) algorithm (see [this paper](https://arxiv.org/abs/1707.06347)) is a good alternative to solving the environment using DDPG. According to the [published benchmarks](https://arxiv.org/pdf/1604.06778.pdf), the PPO strategy also shows better results in continuous control tasks. Perhaps, with the possibility of reaching better outcomes in the future, further implementations using this strategy might well be included this repository (for public benefit).
-* As highlighted in [this section](https://github.com/youldash/DRL-Continuous-Control#distributed-training) of the repo (*i.e.* under **Distributed Training**), implementations using the [A3C](https://arxiv.org/pdf/1602.01783.pdf), and [D4PG](https://openreview.net/pdf?id=SyZipzbCb) algorithms are indeed worthy of investigation, and comparison to the work presented herein.
+* As highlighted in [this section](https://github.com/youldash/DRL-Collaboration-and-Competition#distributed-training) of the repo (*i.e.* under **Distributed Training**), implementations using the [A3C](https://arxiv.org/pdf/1602.01783.pdf), and [D4PG](https://openreview.net/pdf?id=SyZipzbCb) algorithms are indeed worthy of investigation, and comparison to the work presented herein.
 * The [Distributional-DQNs](https://arxiv.org/abs/1707.06887) by Marc G. Bellemare, Will Dabney, and Rémi Munos, is yet another good candidate for further investigation.
 * [Asynchronous Methods for DRL](https://arxiv.org/abs/1602.01783) by Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy P. Lillicrap, Tim Harley, David Silver, and Koray Kavukcuoglu, is yet another good reference to investigate.
 * And others...
