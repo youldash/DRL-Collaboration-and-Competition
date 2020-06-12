@@ -113,34 +113,62 @@ The `critic` model, as mentioned above, builds a Critic (Value) NN that maps `(s
 
 ## The MADDPG (Network) Architecture
 
-The NN architecture for building the training model for the MADDPG algorithm is logged below:
+The NN architecture for building the two training agent models for the MADDPG algorithm is logged below:
 
 ``` Bash
+Agent [#1]
+
 Actor (Local):
 Actor(
-  (fc1): Linear(in_features=24, out_features=768, bias=True)
-  (fc2): Linear(in_features=768, out_features=512, bias=True)
-  (fc3): Linear(in_features=512, out_features=2, bias=True)
+  (fc1): Linear(in_features=24, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=2, bias=True)
 )
 Actor (Target):
 Actor(
-  (fc1): Linear(in_features=24, out_features=768, bias=True)
-  (fc2): Linear(in_features=768, out_features=512, bias=True)
-  (fc3): Linear(in_features=512, out_features=2, bias=True)
+  (fc1): Linear(in_features=24, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=2, bias=True)
 )
 Critic (Local):
 Critic(
-  (fcs1): Linear(in_features=24, out_features=512, bias=True)
-  (fc2): Linear(in_features=514, out_features=256, bias=True)
-  (fc3): Linear(in_features=256, out_features=128, bias=True)
-  (fc4): Linear(in_features=128, out_features=1, bias=True)
+  (fcs1): Linear(in_features=52, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=1, bias=True)
 )
 Critic (Target):
 Critic(
-  (fcs1): Linear(in_features=24, out_features=512, bias=True)
-  (fc2): Linear(in_features=514, out_features=256, bias=True)
-  (fc3): Linear(in_features=256, out_features=128, bias=True)
-  (fc4): Linear(in_features=128, out_features=1, bias=True)
+  (fcs1): Linear(in_features=52, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=1, bias=True)
+)
+_______________________________________________________________
+
+Agent [#2]
+
+Actor (Local):
+Actor(
+  (fc1): Linear(in_features=24, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=2, bias=True)
+)
+Actor (Target):
+Actor(
+  (fc1): Linear(in_features=24, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=2, bias=True)
+)
+Critic (Local):
+Critic(
+  (fcs1): Linear(in_features=52, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=1, bias=True)
+)
+Critic (Target):
+Critic(
+  (fcs1): Linear(in_features=52, out_features=200, bias=True)
+  (fc2): Linear(in_features=200, out_features=150, bias=True)
+  (fc3): Linear(in_features=150, out_features=1, bias=True)
 )
 ```
 
