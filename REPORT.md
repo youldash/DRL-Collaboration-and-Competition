@@ -11,7 +11,7 @@ By using this site, you agree to the **Terms of Use** that are defined in [LICEN
 As mentioned in the [`README.md`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/README.md) file of this repo, The project was developed in partial fulfillment of the requirements for Udacity's [Deep Reinforcement Learning (DRL) Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893) program. To solve the challenges presented therein, we explored (and implemented) working versions of both
 
 - the [Deep Deterministic Policy Gradient (DDPG)](https://spinningup.openai.com/en/latest/algorithms/ddpg.html) algorithm, and
-- the [Multi-agent Deep Deterministic Policy Gradient (MADDPG)](https://openai.com/blog/learning-to-cooperate-compete-and-communicate/) algorithm (see [this](https://arxiv.org/pdf/1706.02275.pdf) paper for details).
+- the [Multi-agent Deep Deterministic Policy Gradient (MADDPG)](https://openai.com/blog/learning-to-cooperate-compete-and-communicate/) algorithm (see [this paper](https://arxiv.org/pdf/1706.02275.pdf) for details).
 
 The MADDPG is a great choice for this environment due to the existence of multiple agents, and the approach presented herein was inspired by the implementation used in the Udacity online labs for solving the physical deception environment.
 
