@@ -58,7 +58,7 @@ Similar to the DDPG algorithm implementation in the previous project, the MADDPG
 
 The [Neural Network (NN)](https://pathmind.com/wiki/neural-network) architecture (used in [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingDDPG.ipynb)) for building the training model for the DDPG algorithm is logged below:
 
-``` Bash
+```
 Actor (Local):
 Actor(
   (fc1): Linear(in_features=24, out_features=768, bias=True)
@@ -115,7 +115,7 @@ The `critic` model, as mentioned above, builds a Critic (Value) NN that maps `(s
 
 The NN architecture (used in [`TennisUsingMADDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingMADDPG.ipynb)) for building the two training agent models for the MADDPG algorithm is logged below:
 
-``` Bash
+```
 Agent [#1]
 
 Actor (Local):
