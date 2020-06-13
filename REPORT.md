@@ -266,7 +266,7 @@ In this training round the MADDPG agents did, initially, reach the desired targe
 
 If you view the MADDPG rewards plot, you can see that the training was a little unstable, and the agent never achieved a rolling score above the `.5` required to solve this environment until much later (and especially after numerous attempts). In fact, we found the training to be quite challenging for the final implementation. Initially, we faced numerous issues getting the full implementation to work as expected. One reason for this is due to the training process being very sensitive to the hyperparameters chosen prior training.
 
-One interesting finding was with the rolling max score exceeding the `.5` score. In fact, we witnessed in exhaustive training sessions (using the same hyperparameter setup) the rolling score exceeding `1.9` and then dropping down, steadily.
+One interesting finding was with the rolling max score exceeding the `.5` score. In fact, we witnessed in exhaustive training sessions (using the same hyperparameter setup) the rolling score exceeding `1.9` and then dropping down, gradually.
 
 ### MADDPG Parameter Tuning
 
