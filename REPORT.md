@@ -198,7 +198,7 @@ In this training round the agents did in fact reach the targeted average score o
 
 A set of tuning parameters (or rather **hyperparameters**) enabled us to explore the possible variations possible for achieving the results (both reported here, and others expected in future tuning attempts). Ideally, it is worthy to mention that one single hyperparameter configuration might work with one `model`, and may well **NOT** be suitable with others.
 
-The DDPG algorithm is implemented using the following function declaration:
+The DDPG algorithm was implemented using the following function declaration:
 
 > See the [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook for the complete function implementation.
 
@@ -236,26 +236,79 @@ WEIGHT_DECAY = 0.       # L2 weight decay.
 NUM_AGENTS = 2          # Number of agents in the environment.
 STATE_SIZE = 24         # State space size.
 ACTION_SIZE = 2         # Action size.
-
-
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-""" Set the working device on the NVIDIA Tesla K80 accelerator GPU (if available).
-    Otherwise we use the CPU (depending on availability).
-"""
 ```
+
+### Rewards Plot (Using the MADDPG Algorithm)
+
+The following graph illustrated the logged outcomes:
+
+![](./plots/RewardsUsingMADDPG.png)
+
+The trained agents, as witnesses in the accompanying [`TennisUsingMADDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingMADDPG.ipynb) notebook file, revealed the following results:
+
+```
+EPISODE: 2294/2700  84% ETA:  0:08:30 |\\\\\ | ROLLING AVG: 0.4789 HIGHEST: 0.0
+
+Environment solved in 2294 episodes...	Average score: 0.50
+EPISODE: 2295/2700  85% ETA:  0:08:35 ||| | ROLLING AVG: 0.5029 HIGHEST: 0.5029
+Model saved successfully.
+EPISODE: 2301/2700  85% ETA:  0:08:41 |-- | ROLLING AVG: 0.5319 HIGHEST: 0.5319
+Model updated successfully.
+EPISODE: 2601/2700  96% ETA:  0:03:07 |// | ROLLING AVG: 0.5724 HIGHEST: 0.5724
+Model updated successfully.
+EPISODE: 2699/2700  99% ETA:  0:00:02 |\\ | ROLLING AVG: 1.3715 HIGHEST: 0.5724
+Model updated successfully.
+
+Total runtime 120.13 minutes.
+```
+
+In this training round the MADDPG agents did, initially, reach the desired targeted average score of `.50` over an exhaustive `2295` number of consecutive episodes. While the DDPG agents were above to solve the environment in a rather shorter time, the MADDPG agents consumed **just over two hours** to conclude (and reach the target in a threshold that was slightly longer than the DDPG run). The reason for extending the MADDPG runtime is to see how would the performance be overall, and to see of the MADDPG agents would actually surpass the targeted goal.
+
+If you view the MADDPG rewards plot, you can see that the training was a little unstable, and the agent never achieved a rolling score above the `.5` required to solve this environment until much later (and especially after numerous attempts). In fact, we found the training to be quite challenging for the final implementation. Initially, we faced numerous issues getting the full implementation to work as expected. One reason for this is due to the training process being very sensitive to the hyperparameters chosen prior training.
+
+One interesting finding was with the rolling max score exceeding the `.5` score. In fact, we witnessed in exhaustive training sessions (using the same hyperparameter setup) the rolling score exceeding `1.9` and then dropping down, steadily.
+
+### MADDPG Parameter Tuning
+
+The following adjustable hyperparameters (see `maddpg/hyperparams.py`) were employed in the training process:
+
+``` Python
+""" Hyperparameter setup.
+"""
+RANDOM_SEED = 0         # Random seed used for PyTorch, NumPy and random packages.
+BUFFER_SIZE = int(1e6)  # Replay buffer size (5e5 | 1e6).
+BATCH_SIZE = 1024       # Minibatch size (128 | 256 | 512 | 1024).
+GAMMA = 99e-2           # Discount factor.
+TAU = 1e-3              # For soft update of target parameters (5e-2 | 1e-3).
+LR_ACTOR = 1e-4         # Learning rate of the Actor (1e-3 | 1e-4 | 5e-4).
+LR_CRITIC = 1e-3        # Learning rate of the Critic (1e-3 | 1e-4 | 5e-4).
+WEIGHT_DECAY = 0.       # L2 weight decay.
+WEIGHT_FREQUENCY = 2    # How often to update the weight (i.e. weight frequency).
+NOISE_AMPL = 1          # Exploration noise amplification.
+NOISE_AMPL_DECAY = 1    # Noise amplification decay.
+
+
+""" Tennis environment setup.
+"""
+NUM_AGENTS = 2          # Number of agents in the environment.
+STATE_SIZE = 24         # State space size.
+ACTION_SIZE = 2         # Action size.
+```
+
+Note that the last two hyperparameters (namely: `NOISE_AMPL` and `NOISE_AMPL_DECAY`) were added in the implementation design, to amplify the exploration noise used by the MADDPG agent in an effort to learn the optimal policy faster.
 
 ## Conclusion and Future Work
 
-This report presented out work in training an agent to solve the environment, while considering varying architectures to determine which `agent` configuration would be deemed the best in our experiments. In all attempts the results shown in the [this part](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/REPORT.md#the-training-notebook) set the benchmark for future attempts. 
+This report presented out work in training DDPG and MADDPG agents to solve the environment, while considering varying architectures to determine which `agent` configuration would be deemed the best in our experiments. In all attempts the results shown in both notebooks set the benchmark for future attempts. 
 
 The work presented herein was made possible using Udacity's [NVIDIA Tesla K80 accelerator GPU](https://www.nvidia.com/en-gb/data-center/tesla-k80/) architecture. In future works we plan on implementing (and training all agents) locally using NVIDIA GPUs (both internally, and externally mounted using eGPU enclosures).
  
 With the possibility of reaching better outcomes by tweaking the parameters a bit (as seen above), perhaps it it noteworthy to include other state-of-the-art algorithm implementations and compare them against our work. These of which include (and are not limited to) the points discussed next.
 
-### Alternatives to Deep Deterministic Policy Gradients
+### Alternatives to Multi-agent Deep Deterministic Policy Gradients
 
 * The [Proximal Policy Optimization (PPO)](https://medium.com/@jonathan_hui/rl-proximal-policy-optimization-ppo-explained-77f014ec3f12) algorithm (see [this paper](https://arxiv.org/abs/1707.06347)) is a good alternative to solving the environment using DDPG. According to the [published benchmarks](https://arxiv.org/pdf/1604.06778.pdf), the PPO strategy also shows better results in continuous control tasks. Perhaps, with the possibility of reaching better outcomes in the future, further implementations using this strategy might well be included this repository (for public benefit).
-* As highlighted in [this section](https://github.com/youldash/DRL-Collaboration-and-Competition#distributed-training) of the repo (*i.e.* under **Distributed Training**), implementations using the [A3C](https://arxiv.org/pdf/1602.01783.pdf), and [D4PG](https://openreview.net/pdf?id=SyZipzbCb) algorithms are indeed worthy of investigation, and comparison to the work presented herein.
+* Perhaps, implementations using the [A3C](https://arxiv.org/pdf/1602.01783.pdf), and [D4PG](https://openreview.net/pdf?id=SyZipzbCb) algorithms are indeed worthy of investigation, and comparison to the work presented in this repo.
 * The [Distributional-DQNs](https://arxiv.org/abs/1707.06887) by Marc G. Bellemare, Will Dabney, and Rémi Munos, is yet another good candidate for further investigation.
 * [Asynchronous Methods for DRL](https://arxiv.org/abs/1602.01783) by Volodymyr Mnih, Adrià Puigdomènech Badia, Mehdi Mirza, Alex Graves, Timothy P. Lillicrap, Tim Harley, David Silver, and Koray Kavukcuoglu, is yet another good reference to investigate.
 * And others...
