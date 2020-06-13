@@ -192,42 +192,56 @@ EPISODE: 1203/2000  60% ETA:  0:28:31 |\\\\\\\\\\\        | ROLLING AVG: 0.4926
 Environment solved in 1203 episodes.	Average score: 0.51
 ```
 
-In this training round the agents did in fact reach the targeted average score of `.51` over `1203` consecutive episodes. These results indicate that the architecture used is in fact suitable, yet subject to further improvements and comparisons with the MADDPG implementation, which is described next.
+In this training round the agents did in fact reach the targeted average score of `.51` over `1203` consecutive episodes. These results indicate that the architecture used is in fact suitable, yet subject to further improvements and comparisons with the MADDPG implementation, which is described later.
 
-### Parameter Tuning
+### DDPG Parameter Tuning
 
-In all of our experiments a set of tuning parameters (or rather **hyperparameters**) enabled us to explore the possible variations possible for achieving the results (both reported here, and others expected in future tuning attempts). Ideally, it is worthy to mention that one single hyperparameter configuration might work with one `model`, and may well **NOT** be suitable with others.
-
-### Notebook Parameters
+A set of tuning parameters (or rather **hyperparameters**) enabled us to explore the possible variations possible for achieving the results (both reported here, and others expected in future tuning attempts). Ideally, it is worthy to mention that one single hyperparameter configuration might work with one `model`, and may well **NOT** be suitable with others.
 
 The DDPG algorithm is implemented using the following function declaration:
 
 > See the [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook for the complete function implementation.
 
 ``` Python
-def ddpg(n_episodes=int(1e3), max_t=int(1e3)):
-    """ Implementation of the Deep Deterministic Policy Gradient (DDPG) algorithm.
-        See <https://spinningup.openai.com/en/latest/algorithms/ddpg.html>.
+def train(agent, env, n_episodes=int(2e3), autosave_every=int(1e2)):
+    """ Train agents currently running the environment,
+        using a Deep Deterministic Policy Gradient (DDPG) algorithm wrapper.
     
     Params
     ======
-        n_episodes (int): Maximum number of training episodes
-        max_t (int): Maximum number of time steps per episode
+        agent (DDPG): Instance of the DDPG wrapper class
+        env (UnityEnvironment): Instance of the Unity environment for DDPG agent training
+        n_episodes (int): Number of episodes to train an agent (or agents)
+        autosave_every (int): Threshold (or frequency) for auto-saving model weights to disk
     """
 ```
 
-The following parameter segments are also adjustable (see the `agent.py` Python script for details):
+The following parameter segments are also adjustable (see the `ddpg/hyperparams.py` Python script for details):
 
 ``` Python
 """ Hyperparameter setup.
 """
-BUFFER_SIZE = int(1e6)  # Replay buffer size (5e5 | 1e6).
+RANDOM_SEED = 0         # Random seed used for PyTorch, NumPy and random packages.
+BUFFER_SIZE = int(1e6)  # Replay buffer size (1e5 | 5e5 | 1e6).
 BATCH_SIZE = 1024       # Minibatch size (128 | 256 | 512 | 1024).
-LR_ACTOR = 1e-4         # Learning rate of the Actor (1e-3 | 1e-4).
-LR_CRITIC = 1e-3        # Learning rate of the Critic (1e-3 | 1e-4).
 GAMMA = 99e-2           # Discount factor.
-TAU = 1e-3              # For soft update of target parameters.
+TAU = 1e-3              # For soft update of target parameters (1e-2 | 5e-2 | 1e-3).
+LR_ACTOR = 1e-4         # Learning rate of the Actor (1e-3 | 1e-4 | 5e-4).
+LR_CRITIC = 1e-3        # Learning rate of the Critic (1e-3 | 1e-4 | 5e-4).
 WEIGHT_DECAY = 0.       # L2 weight decay.
+
+
+""" Tennis environment setup.
+"""
+NUM_AGENTS = 2          # Number of agents in the environment.
+STATE_SIZE = 24         # State space size.
+ACTION_SIZE = 2         # Action size.
+
+
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+""" Set the working device on the NVIDIA Tesla K80 accelerator GPU (if available).
+    Otherwise we use the CPU (depending on availability).
+"""
 ```
 
 ## Conclusion and Future Work
