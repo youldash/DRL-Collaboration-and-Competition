@@ -174,30 +174,25 @@ Critic(
 
 ## Early Attempts
 
-- Numerous attempts were made to improve the results obtained from training the networks. All ended with no favorable outcomes, thus losing precious GPU time when using the Udacity workspace. Our attempts were based on [choosing 20 agents and training them for solving the environment](https://github.com/youldash/DRL-Collaboration-and-Competition#version-2-twenty-20-agents). See the following figure (plot) for a failed attempt (*i.e.* the agents didn't reach the targeted average score of `+30` over `100` consecutive episodes, and over all agents):
+- Numerous attempts were made to improve the results obtained from training the networks. All ended with no favorable outcomes, thus losing precious GPU time when using the Udacity workspace.
+- A good attempt was made to train the DDPG solution in a simple manner (given the network configuration above). Only a few changes in the parameters from the previous project implementation solved the environment.
+- Our best training configuration is reported herein. A DDPG `agent` configuration solved the virtual world (or environment) in a good number of episodes. This was set as a point of reference to beat in our future attempts.
 
-[attempt]: plot/Attempt.png "Failed attempt."
+### Rewards Plot (Using the DDPG Algorithm)
 
-<div align="center">
-	<img src="plots/Attempt.png" width="100%" />
-</div>
+The following graph illustrated the outcomes:
 
-- Our best training configuration is reported herein. A DDPG `agent` configuration solved the virtual world (or environment) in a good number of episodes. This was set as a point of reference to beat in our future attempts. The `agent`'s architecture was adjusted based on the following NN configurations:
+![](./plots/RewardsUsingDDPG.png)
 
+The trained agents, as witnesses in the accompanying [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingDDPG.ipynb) notebook file, revealed the following results:
 
+```
+EPISODE: 1203/2000  60% ETA:  0:28:31 |\\\\\\\\\\\        | ROLLING AVG: 0.4926
 
+Environment solved in 1203 episodes.	Average score: 0.51
+```
 
-
-## The Training Notebook
-
-See the [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/TennisUsingDDPG.ipynb) Jupyter notebook for implementation details and the rewards (*i.e.* the results) obtained after training and testing. The experiments shown in the notebook yielded **outstanding** results.
-
-In addition to the notebook you'll have access to the following Python files:
-
-* `agent.py` contains a DDPG agent implementation, which interacts with the environment to optimize the rewards.
-* `buffer.py` contains a `ReplayBuffer` class, which is used by the agent to record and sample `(state, action, reward, next_state)` tuples for training of the model.
-* `model.py` includes both `actor` and `critic` modules, and takes in the input **state** and outputs the desired `Q-values`.
-* `noise.py` implements the Ornstein–Uhlenbeck stochastic process (as mentioned above), which adds noise to the actions.  
+In this training round the agents did in fact reach the targeted average score of `.51` over `1203` consecutive episodes. These results indicate that the architecture used is in fact suitable, yet subject to further improvements and comparisons with the MADDPG implementation, which is described next.
 
 ### Parameter Tuning
 
@@ -207,7 +202,7 @@ In all of our experiments a set of tuning parameters (or rather **hyperparameter
 
 The DDPG algorithm is implemented using the following function declaration:
 
-> See the [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook for the complete function implementation.
+> See the [`TennisUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook for the complete function implementation.
 
 ``` Python
 def ddpg(n_episodes=int(1e3), max_t=int(1e3)):
@@ -234,28 +229,6 @@ GAMMA = 99e-2           # Discount factor.
 TAU = 1e-3              # For soft update of target parameters.
 WEIGHT_DECAY = 0.       # L2 weight decay.
 ```
-
-### Rewards Plot
-
-The following graph illustrated the outcomes:
-
-![](./plots/Rewards.png)
-
-The trained agents, as witnesses in the accompanying   [`ContinuousControlUsingDDPG.ipynb`](https://github.com/youldash/DRL-Collaboration-and-Competition/blob/master/ContinuousControlUsingDDPG.ipynb) notebook file, revealed the following results:
-
-```
-EP 119	MIN: 29.68	MAX: 39.17	SCORE: 36.58	BEST: 37.66	AVG: 29.49	BEST AVG: 29.49
-EP 120	MIN: 32.61	MAX: 37.86	SCORE: 35.52	BEST: 37.66	AVG: 29.78	BEST AVG: 29.78
-EP 121	MIN: 32.41	MAX: 39.15	SCORE: 36.60	BEST: 37.66	AVG: 30.08	BEST AVG: 30.08
-
-Environment solved in 21 episodes.	Average score (μ): 30.08
-
-Models saved successfully.
-
-Total runtime 193.82 minutes.
-```
-
-In this training round the agents did in fact reach the targeted average score of `+30` over `100` consecutive episodes, and over all agents. The number of episodes were reportedly `21` (*i.e.* `21` + the initial `100` training episodes).
 
 ## Conclusion and Future Work
 
